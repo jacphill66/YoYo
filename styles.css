@@ -1,0 +1,23 @@
+body {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    margin: 0;
+	/*background-color:black;*/
+}
+
+#control-pannel{
+    display:block;
+    background-color:white;
+    height:100%;
+    width:20%;
+}
+
+#square{
+	/*transition: 0.1s all ease;*/
+}
+
+svg {
+   /*border: 1px solid #ddd;*/
+}
