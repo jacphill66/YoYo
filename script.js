@@ -44,7 +44,7 @@ function generateRandomColor() {
 	return color;
   }
   
-
+/*
 async function generateFood(grid, x_max, y_max, side_length, amount){
 	let x = Math.floor(Math.random() * x_max);
 	let y = Math.floor(Math.random() * y_max);
@@ -57,7 +57,7 @@ async function generateFood(grid, x_max, y_max, side_length, amount){
 		}
 		await wait(10);
 	}
-}
+}*/
 
 function valid_move(action, x, y, x_max, y_max){
 	if((x == 0) && action=='L') return false;
@@ -91,45 +91,33 @@ function initializeValueTable(initial_value_code, x_max, y_max){
 	return table;
 }
 
-function generateQuadGrid(grid, x_max, y_max, mode_flag){
+function generateQuadGrid(grid, x_max, y_max){
 	let quad_grid = [];
 	for(let i = 0; i < x_max; i++){
 		quad_grid.push([]);
 		for(let j = 0; j < y_max; j++){
 			quad_grid[i].push([])
-			if(mode_flag){
-				if(grid[i][j].getAttribute('fill')=='white') quad_grid[i][j] = 0;
-				else quad_grid[i][j] = 1;
-			}
-			else{
-				if(grid[i][j].getAttribute('fill')=='black') quad_grid[i][j] = 0;
-				else if(grid[i][j].getAttribute('fill')=='red') quad_grid[i][j] = 1;
-				else if(grid[i][j].getAttribute('fill')=='white') quad_grid[i][j] = 2;
-				else if(grid[i][j].getAttribute('fill')=='green') quad_grid[i][j] = 3;
-				else throw new Error("Invalid Grid Color");
-			}
+			if(grid[i][j].getAttribute('fill')=='#f0f0f0') quad_grid[i][j] = 0;
+			else if(grid[i][j].getAttribute('fill')=='#F44336') quad_grid[i][j] = 1;
+			else if(grid[i][j].getAttribute('fill')=='#3b3b3b') quad_grid[i][j] = 2;
+			else if(grid[i][j].getAttribute('fill')=='#4CAF50') quad_grid[i][j] = 3;
+			else throw new Error("Invalid Grid Color");
 		}
 	}
 	return quad_grid;
 }
 
-function initializeRewardTable(quad_grid, x_max, y_max, mode_flag){
+function initializeRewardTable(quad_grid, x_max, y_max){
 	let rewards = [];
 	for(let i = 0; i < x_max; i++){
 		rewards.push([]);
 		for(let j = 0; j < y_max; j++){
 			rewards[i].push([])
-			if(mode_flag){
-				if(quad_grid[i][j] == 1) rewards[i][j] = -0.1;
-				else rewards[i][j] = 0.5;
-			}
-			else{
-				if(quad_grid[i][j] == 0) rewards[i][j] = -100;//black
-				else if(quad_grid[i][j] == 1) rewards[i][j] = 50;//red
-				else if(quad_grid[i][j] == 2) rewards[i][j] = -1;//white
-				else if(quad_grid[i][j] == 3) rewards[i][j] = -1;//green
-				else throw new Error("Invalid Grid Color");
-			}
+			if(quad_grid[i][j] == 0) rewards[i][j] = -100;//black
+			else if(quad_grid[i][j] == 1) rewards[i][j] = 50;//red
+			else if(quad_grid[i][j] == 2) rewards[i][j] = -1;//white
+			else if(quad_grid[i][j] == 3) rewards[i][j] = -1;//green
+			else throw new Error("Invalid Grid Color");
 		}
 	}
 	return rewards;
@@ -192,46 +180,56 @@ function moveAgent(agent, x, y, side_length){
 	agent.setAttribute('y', y*side_length);
 }
 
-async function delayedMove(agent, wait_time, x, y, side_length, grid, mode_flag, pos_list){
+async function delayedMove(agent, wait_time, x, y, side_length){
 	moveAgent(agent, x, y, side_length);
-	if(mode_flag && grid[x][y].getAttribute('fill') != 'white') munch(grid, x, y, pos_list);
+	//if(mode_flag && grid[x][y].getAttribute('fill') != 'white') munch(grid, x, y, pos_list);
 	await wait(wait_time);
 }
 
+/*
 function reset_food_grid(grid, pos_list){
 	for(let i = 0; i < pos_list.length; i++){
 		let t = pos_list[i]
 		grid[t[1]][t[2]].setAttribute('fill', t[0])
 		grid[t[1]][t[2]].setAttribute('stroke', 'black')
 	}
-}
+}*/
+/*
+async function highlightSolution(agent, wait_time, x, y, side_length, grid, qVals, epsilon, x_max, y_max){
+	await delayedMove(agent, wait_time, x, y, side_length, grid, qVals);
+	for(let i = 0; i < 100; i++){
+		let [m, a, new_x, new_y] = apply_policy(qVals, epsilon, x, y, x_max, y_max)
+		await delayedMove(agent, wait_time, new_x, new_y, side_length);	
+		x = new_x;
+		y = new_y;
+		if(grid[x][y].getAttribute('fill') == '#F44336') return;
+	}
+}*/
 
-async function QLearning(grid, initial_value_code, alpha, gamma, epsilon, side_length, x_max, y_max, color, mode_flag){
-	console.log("q-learning")
+async function QLearning(grid, initial_value_code, alpha, gamma, epsilon, side_length, x_max, y_max, color){
 	let speed_input = document.getElementById('speed');
-	let wait_time = speed_input.value;
+	let wait_time = 101-speed_input.value;
 	speed_input.addEventListener("input", (event) => { 
-		wait_time = event.target.value;
+		wait_time = 101-event.target.value;
 		if(wait_time > 0) agent.setAttribute('transition', `${wait_time/1000}s all ease`);
 	});
-	let quad_grid = generateQuadGrid(grid, x_max, y_max, mode_flag);
-	let reward_table = initializeRewardTable(quad_grid, x_max, y_max, mode_flag);
-	let start_pos = find_start(grid, mode_flag);
+	//let wait_time = 10;
+	let quad_grid = generateQuadGrid(grid, x_max, y_max);
+	let reward_table = initializeRewardTable(quad_grid, x_max, y_max);
+	let start_pos = find_start(grid);
 	let agent = generateSquare(wait_time, start_pos[0], start_pos[1], color, side_length);
 	let QValueTable = initializeValueTable(initial_value_code, x_max, y_max);
 	var current_state = [agent.getAttribute('x'), agent.getAttribute('y')];
-
 	for(let i = 0; i < episodes; i++){
 		var [x, y] = start_pos;
 		let moves = 0;
 		let pos_list = [];
 		let actions = [];
-		if (wait_time > 0) await delayedMove(agent, wait_time, x, y, side_length, grid, mode_flag, pos_list);
+		if (wait_time > 0) await delayedMove(agent, wait_time, x, y, side_length, grid, pos_list);
 		do{
-			console.log(QValueTable)
 			current_state = [x, y];
 			let [m, a, new_x, new_y] = apply_policy(QValueTable, epsilon, current_state[0], current_state[1], x_max, y_max)
-			if (wait_time > 0) await delayedMove(agent, wait_time, new_x, new_y, side_length, grid, mode_flag, pos_list);
+			if (wait_time > 0) await delayedMove(agent, wait_time, new_x, new_y, side_length, grid, pos_list);
 			let reward = reward_table[new_x][new_y];
 			let entry = QValueTable[current_state[0]][current_state[1]];
 			entry.set(a, entry.get(a)+alpha*(reward+gamma*m-entry.get(a)));
@@ -239,29 +237,30 @@ async function QLearning(grid, initial_value_code, alpha, gamma, epsilon, side_l
 			y = new_y;
 			moves += 1;
 			actions.push(a)
-		}while((mode_flag && moves < 10) || (!mode_flag && (grid[x][y].getAttribute('fill') != 'black' && grid[x][y].getAttribute('fill') != 'red')));
-		if(!mode_flag && grid[x][y].getAttribute('fill') == 'red'){
+		}while(grid[x][y].getAttribute('fill') != '#F44336');
+		//while(grid[x][y].getAttribute('fill') != '#F44336');
+		//grid[x][y].getAttribute('fill') != '#f0f0f0' && grid[x][y].getAttribute('fill') != '#F44336'
+		/*if(grid[x][y].getAttribute('fill') == '#F44336'){
 			console.log(actions)
 			return;
-		}
-		if(mode_flag) reset_food_grid(grid, pos_list)
+		}*/
 	}	
+	highlightSolution(agent, wait_time, start_pos[0], start_pos[1], side_length, grid, QValueTable, epsilon, x_max, y_max);
 }
 
-async function Sarsa(grid, initial_value_code, alpha, gamma, epsilon, side_length, x_max, y_max, color, mode_flag){
+async function Sarsa(grid, initial_value_code, alpha, gamma, epsilon, side_length, x_max, y_max, color){
 	console.log("sarsa")
 	let speed_input = document.getElementById('speed');
-	let wait_time = speed_input.value;
+	let wait_time = 100-speed_input.value;
 
 	speed_input.addEventListener("input", (event) => { 
-		wait_time = event.target.value;
+		wait_time = 100-event.target.value;
 		if(wait_time > 0) agent.setAttribute('transition', `${wait_time/1000}s all ease`);
 	});
 
-	let quad_grid = generateQuadGrid(grid, x_max, y_max, mode_flag);//change this
-	let reward_table = initializeRewardTable(quad_grid, x_max, y_max, mode_flag);//change this
-	let start_pos = find_start(grid, mode_flag);//change this
-	//write some final state function
+	let quad_grid = generateQuadGrid(grid, x_max, y_max);//change this
+	let reward_table = initializeRewardTable(quad_grid, x_max, y_max);//change this
+	let start_pos = find_start(grid);
 
 	let agent = generateSquare(wait_time, start_pos[0], start_pos[1], color, side_length);
 	let QValueTable = initializeValueTable(initial_value_code, x_max, y_max);
@@ -319,7 +318,7 @@ function randomAdjacentCell(cell, grid, side_length, x_max, y_max){
 
 	if(adjacent_cells.length > 0){
 		let i = Math.floor(Math.random()*adjacent_cells.length);
-		adjacent_cells[i][1].setAttribute('fill', 'white');
+		adjacent_cells[i][1].setAttribute('fill', '#3b3b3b');
 		//adjacent_cells[i][1].setAttribute('stroke', 'white');
 		return adjacent_cells[i][0];
 	}
@@ -331,7 +330,7 @@ async function generateMazeRecursivley(cell, grid, animatize, side_length, x_max
 	while(c != null){
 		//await wait(waitTime);
 		if(animatize) await wait(10);
-		c.setAttribute('fill', 'white');
+		c.setAttribute('fill', '#3b3b3b');
 		c.setAttribute('data-visited', 't');
 		await generateMazeRecursivley(c, grid, animatize, side_length, x_max, y_max);
 		c = randomAdjacentCell(cell, grid, side_length, x_max, y_max);
@@ -340,9 +339,9 @@ async function generateMazeRecursivley(cell, grid, animatize, side_length, x_max
 
 function find_start(grid, mode_flag){
 	if(mode_flag) return [0, 0];
-	if(grid[0][0].getAttribute("fill") != "black") return [0, 0];
-	else if(grid[0][1].getAttribute("fill") != "black") return [0, 1];
-	else if(grid[1][0].getAttribute("fill") != "black") return [1, 0];
+	if(grid[0][0].getAttribute("fill") != "#f0f0f0") return [0, 0];
+	else if(grid[0][1].getAttribute("fill") != "#f0f0f0") return [0, 1];
+	else if(grid[1][0].getAttribute("fill") != "#f0f0f0") return [1, 0];
 	else return [1, 1];
 }
 
@@ -350,9 +349,9 @@ function find_end(grid, x_max, y_max, mode_flag){
 	if(mode_flag) return [x-1, y-1];
 	let x = x_max;
 	let y = y_max;
-	if(grid[x-1][y-1].getAttribute("fill") != "black") return [x-1, y-1];
-	else if(grid[x-1][y-2].getAttribute("fill") != "black") return [x-1, y-2];
-	else if(grid[x-2][y-1].getAttribute("fill") != "black") return [x-2, y-1];
+	if(grid[x-1][y-1].getAttribute("fill") != "#f0f0f0") return [x-1, y-1];
+	else if(grid[x-1][y-2].getAttribute("fill") != "#f0f0f0") return [x-1, y-2];
+	else if(grid[x-2][y-1].getAttribute("fill") != "#f0f0f0") return [x-2, y-1];
 	else return [x-2, y-2];
 }
 
@@ -362,15 +361,14 @@ async function generateMaze(grid, animatize, side_length, x_max, y_max){
 	let cells = document.getElementsByClassName('cell');
 	for(let j = 0; j < cells.length; j++){
 		cells[j].setAttribute('stroke', 'black');
-		cells[j].setAttribute('fill', 'black');
+		cells[j].setAttribute('fill', '#f0f0f0');
 	}	
 	await generateMazeRecursivley(grid[randomX][randomY], grid, animatize, side_length, x_max, y_max);
 	let start_pos = find_start(grid);
 	let end_pos = find_end(grid, x_max, y_max);
-	grid[start_pos[0]][start_pos[1]].setAttribute("fill", "green");
-	grid[end_pos[0]][end_pos[1]].setAttribute("fill", "red");
+	grid[start_pos[0]][start_pos[1]].setAttribute("fill", "#4CAF50");
+	grid[end_pos[0]][end_pos[1]].setAttribute("fill", "#F44336");
 }
-
 
 function clear_svg(svg){
 	while (svg.firstChild) {
@@ -382,100 +380,62 @@ const wait = (ms) => new Promise(resolve => setTimeout(resolve, ms))
 
 //Animation Constants
 const color = "blue";//Random for random colors
-const numberOfSquares = 1;//vestigial
 const svgID = "viewbox";
 const squareID = "square";
 const svg_field = document.getElementById(svgID);
-//const x_max = svg_field.clientWidth/side_length;
-//const y_max = svg_field.clientHeight/side_length;
-
 const actions = ['L', 'R', 'D', 'U'];
 
-
-let episodes = 100;//number of episodes
+let episodes = 100;
 var wait_time = 10;
 
 var success_count = 0;
 
+function determineSideLength(size){
+	switch(parseInt(size)){
+		case 5: return 10;
+		case 4: return 20;
+		case 3: return 25;
+		case 2: return 50;
+		case 1: return 100;
+		case 0: return 125;
+	}
+}
+
 async function main(){
-	let episode_input = document.getElementById("episodes");
 
-	let alpha_input = document.getElementById("alpha");
-	let gamma_input = document.getElementById("gamma");
-	let epsilon_input = document.getElementById("epsilon");
-
-	let maze_input = document.getElementById('maze');
-	let food_input = document.getElementById('food');
-
-	let run_input = document.getElementById('run');
-	let generate_input = document.getElementById('generate');
-
-	let size_1_input = document.getElementById('size-1');
-	let size_2_input = document.getElementById('size-2');
-	let size_3_input = document.getElementById('size-3');
-	let size_4_input = document.getElementById('size-4');
-
-	let q_learning_input = document.getElementById('q-learning');
-	let sarsa_input = document.getElementById('sarsa');
-
-
-	let side_length = 125;
+	let run = document.getElementById('go-button');
+	let sizeSilder = document.getElementById('slider-label-2');
+	let side_length = determineSideLength(sizeSilder.value);
+	console.log(side_length);
 	let x_max = 1000/side_length;
 	let y_max = 500/side_length;
-	//Parameters:
+	sizeSilder.oninput = function() {
+		side_length = determineSideLength(this.value);
+		x_max = 1000/side_length;
+		y_max = 500/side_length;
+		console.log(side_length);
+    };
+	
 	let initial_value_code = "A";
-	let alpha = 0.6;//learning rate
+	let alpha = 0.1;//learning rate
 	let gamma = 0.9;//discount rate
 	let epsilon = 0.01;//greedy-epsilon policy function
 
 	let amount = 10;
 
 	let maze = true;
-	let food = false;
-
 	let sarsa = false;
 	let q_learning = true;
 
-	alpha_input.oninput = () => {alpha = parseFloat(alpha_input.value);};
-	gamma_input.oninput = () => {gamma = parseFloat(gamma_input.value);};
-	epsilon_input.oninput = () => {epsilon = parseFloat(epsilon_input.value);};
-
-	episode_input.oninput = () => {episodes = parseInt(episode_input.value);}
-
-
-	maze_input.addEventListener("click", (event) => {maze = true; food = false;});
-	food_input.addEventListener("click", (event) => {maze = false; food = true;});
-
-
-	size_1_input.addEventListener("click", (event) => {side_length = 125; x_max = 1000/side_length; y_max = 500/side_length; amount=5;});
-	size_2_input.addEventListener("click", (event) => {side_length = 100; x_max = 1000/side_length; y_max = 500/side_length; amount=10;});
-	size_3_input.addEventListener("click", (event) => {side_length = 50; x_max = 1000/side_length; y_max = 500/side_length; amount=40;});
-	size_4_input.addEventListener("click", (event) => {side_length = 25; x_max = 1000/side_length; y_max = 500/side_length; amount=100;});
-
-	q_learning_input.addEventListener("click", (event) => {sarsa_input = false; q_learning = true;});
-	q_learning_input.addEventListener("click", (event) => {sarsa_input = true; q_learning = false;});
-
-
-	//size_1_input.addEventListener = (event) => {console.log("called1")};
-	//size_2_input.addEventListener = (event) => {console.log("called2")};
-	//size_3_input.addEventListener = (event) => {console.log("called3")};
-	//size_4_input.addEventListener = (event) => {console.log("called4")};
-
-	//let grid = generateGrid();
-	let grid = generateGrid(side_length, x_max, y_max)
-	generate_input.addEventListener("click", async function(event){
+	let grid = null;
+	let color = "blue";
+	color = "#FF9800";
+	run.addEventListener("click", async function(event){
 		clear_svg(svg_field); 
 		grid = generateGrid(side_length, x_max, y_max);
-		if(maze) await generateMaze(grid, true, side_length, x_max, y_max); 
-		else if(food) await generateFood(grid, x_max, y_max, side_length, amount);
-		await wait(1000);
+		await generateMaze(grid, true, side_length, x_max, y_max); 
+		await QLearning(grid, initial_value_code, alpha, gamma, epsilon, side_length, x_max, y_max, color)
+		//clear_svg(svg_field); 
 	});
-	let color = "blue";
-	color = "pink"
-	run_input.addEventListener("click", async function(event){
-		if(sarsa) await Sarsa(grid, initial_value_code, alpha, gamma, epsilon, side_length, x_max, y_max, color, food);
-		else if(q_learning) await QLearning(grid, initial_value_code, alpha, gamma, epsilon, side_length, x_max, y_max, color, food)
-	});
-
 }
 main();

@@ -4,45 +4,37 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="styles.css">
-    <title>Reinforcement Learning</title>
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+    <title>YoYo</title>
 </head>
 <body>
-    <div id="control-pannel">
-        <label for="alpha">Alpha (Learning Rate):<input type="text" id="alpha"></label>
-        <br><br>
-        <label for="gamma">Gamma (Discount Rate):<input type="text" id="gamma"></label>
-        <br><br>
-        <label for="epsilon">Epsilon (Greedy-Epsilon Policy):<input type="text" id="epsilon"></label>
-        <br><br>
-        <label for="episodes">Episodes:<input type="text" id="episodes"></label>
-        <br><br>
-        <div>
-            <label for="maze"> <input type="radio" id="maze" name="mode-form" value="maze" checked />Maze</label>
-            <label for="food"><input type="radio" id="food" name="mode-form" value="food" />Food</label>
-        </div>
-        <br><br>
-        <div>
-            <label for="size-1"><input type="radio" id="size-1" name="size-form" value="size-1" checked />S</label>
-            <label for="size-2"><input type="radio" id="size-2" name="size-form" value="size-2" />M</label>
-            <label for="size-3"> <input type="radio" id="size-3" name="size-form" value="size-3" />L</label>
-            <label for="size-4"> <input type="radio" id="size-4" name="size-form" value="size-4" />XL</label>
 
-        </div>
-        <br><br>
-        <div>
-            <label for="q-learning"><input type="radio" id="q-learning" name="algo" value="q-learning" checked />Q</label>
-            <label for="sarsa"><input type="radio" id="sarsa" name="algo" value="sarsa" />S</label>
-        </div>
-        <br><br>
-        <div>
-            <button id="generate" type="button">Generate</button>
-        </div>
-        <br><br>
-        <div>
-            <button id="run" type="button">Run</button>
-        </div>
-        <br><br>
-        <label for="speed">Speed:<input type="range" id="speed" min="0" max="1000"></label>
+    <div id="control-pannel">
+    <div id = "title">
+		YoYo
+	</div>
+	<label class = "slider-label"  for="slider1">Speed:</label>
+    <input id = "speed" type="range" id="slider1" name="slider1" min="1" max="100" value="50">
+    <span id="value1"></span>
+
+    <br><br>
+
+    <!-- Second Slider -->
+    <label  class = "slider-label" for="slider2">Maze Size:</label>
+    <input id = "slider-label-2" type="range" id="slider2" step = "1" name="slider2" min="0" max="5" value = "3">
+    <span id="value2"></span>
+	
+	
+	
+	<div id = "spacer">
+		
+	</div>
+	
+	<div id="go-button">
+	Go!
+	</div>
     </div>
     <svg id="viewbox" width="1200" height="500"> </svg>
 

@@ -4,20 +4,97 @@ body {
     justify-content: center;
     height: 100vh;
     margin: 0;
-	/*background-color:black;*/
+	background-color:#FFFFF0;
 }
 
 #control-pannel{
     display:block;
-    background-color:white;
+    background-color:#4189e0;
     height:100%;
-    width:20%;
+    width:15%;
+	justify-content: center;
+	align-items: center;
 }
 
-#square{
-	/*transition: 0.1s all ease;*/
+#title{
+  background-color:#366fba;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: white;
+  font-size: 36px;
+  font-family: "Poppins", sans-serif;
+  font-weight: 100;
+  font-style: normal;
+  text-align: center;
+  height:20%;
+  width:100%;
 }
 
-svg {
-   /*border: 1px solid #ddd;*/
+.slider-label {
+    font-family: "Poppins", sans-serif;
+    font-size: 14px;
+    font-weight: bold;
+    color: white;
+}
+
+
+#go-button{
+  background-color: #366fba;
+  color: white;
+  border-radius: 8px;
+  font-family: 'Poppins', sans-serif;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.3s, transform 0.2s, box-shadow 0.3s;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height:10%;
+  width:100%;
+}
+
+#go-button {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+#go-button:hover {
+  background-color: #366fba;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+}
+
+#go-button:active {
+  transform: scale(0.98);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+#sizes{
+	  display: grid;
+  justify-content: center;
+  align-items: center;
+	height:20%;
+}
+
+#size-text{
+  color: white;
+  font-size: 18px;
+  font-family: "Poppins", sans-serif;
+  font-weight: 100;
+}
+
+#spacer{
+	height:30%;
+}
+
+#slider{
+  display: flex;
+  justify-content: center;
+  height:50%;
+  -webkit-appearance: slider-vertical;
 }
